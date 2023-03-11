@@ -1,0 +1,16 @@
+{
+  "2023-04-05": [
+    {
+      "id": "a7",
+      "kestvus": "50min",
+      "nimi": "Jooks",
+      "väljad": [
+        {
+          "nimi": "km",
+          "väärtus": "5",
+          "väljad": null
+        }
+      ]
+    }
+  ]
+}
