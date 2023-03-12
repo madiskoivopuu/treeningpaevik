@@ -1,9 +1,8 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.io.FileWriter;
+import java.util.*;
 
 import jdk.jshell.spi.ExecutionControl;
 import org.json.*;
@@ -50,9 +49,8 @@ public class Andmebaas {
 
             // vaatame läbi kõik trennid, mis sel kuupäeval tegime
             JSONArray treeningud = kuupäevadKoosTrennidega.getJSONArray(kuupäev);
-            Iterator<Object> it = treeningud.iterator();
-            while(it.hasNext()) {
-                JSONObject trennJson = (JSONObject)it.next();
+            for (Object o : treeningud) {
+                JSONObject trennJson = (JSONObject) o;
                 String trenniNimi = trennJson.getString("nimi");
                 String trenniKestvus = trennJson.getString("kestvus");
                 String id = trennJson.getString("id");
@@ -70,7 +68,21 @@ public class Andmebaas {
     }
 
     private JSONArray väljaObjektidJsoniks(List<Andmeväli> väljad) {
-        throw new ExecutionControl.NotImplementedException("pole valmis");
+        JSONArray väljadJson = new JSONArray();
+        for(Andmeväli andmed : väljad) {
+            JSONObject andmedJson = new JSONObject();
+            andmedJson.put("nimi", andmed.getNimi());
+            andmedJson.put("väärtus", andmed.getVäärtus());
+            if(andmed.getSisemisedVäljad() != null)
+                andmedJson.put("väljad", this.väljaObjektidJsoniks(andmed.getSisemisedVäljad()));
+            else
+                andmedJson.put("väljad", JSONObject.NULL);
+
+            // lisame andmete Jsoni listi
+            väljadJson.put(andmedJson);
+        }
+
+        return väljadJson;
     }
     private JSONArray trenniObjektidJsoniks(List<Trenn> trennid) {
         JSONArray trennidJson = new JSONArray();
@@ -87,11 +99,19 @@ public class Andmebaas {
         return trennidJson;
     }
 
-    public void salvestaAndmebaas() {
+    public void salvestaAndmebaas() throws java.io.IOException {
+        // Java objektide muundamine JSONiks
         JSONObject uusAndmebaas = new JSONObject();
         for(String kuupäev : this.trenniAndmed.keySet()) {
             List<Trenn> trennid = this.trenniAndmed.get(kuupäev);
             uusAndmebaas.put(kuupäev, this.trenniObjektidJsoniks(trennid));
+        }
+
+        // faili salvestamine
+        File andmebaasiFail = new File(ANDMEBAASI_FAIL);
+        try (FileWriter salvestus = new FileWriter(andmebaasiFail)) {
+            salvestus.write(uusAndmebaas.toString());
+            salvestus.flush();
         }
     }
 
@@ -99,5 +119,6 @@ public class Andmebaas {
     public static void main(String[] args) throws Exception {
         Andmebaas andmed = new Andmebaas();
         andmed.laeAndmebaas();
+        andmed.salvestaAndmebaas();
     }
 }

@@ -1,0 +1,1 @@
+{"2023-04-05":[{"nimi":"Jooks","väljad":[{"nimi":"km","väärtus":"5","väljad":null}],"kestvus":"50min","id":"a7"}]}
