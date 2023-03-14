@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import jdk.jshell.spi.ExecutionControl;
 import org.json.*;
@@ -15,21 +16,48 @@ public class Andmebaas {
         this.trenniAndmed = new HashMap<>();
     }
 
-    //lisaTrenn(String kuupäev, String nimi, String kestvus)
-    //looUusKuupäev(String kuupäev)
+    public void lisaTrenn(String kuupäev, String nimi, String kestvus) {
+        //loome uue random ID et seda trenniga koos kasutada (panin kolmekohalise sest siis on vast piisavalt palju trenne võimalik lisada)
+        int id = (int) (Math.random() * 1000);
+        //loome juba kasutusel olevate IDde listi
+        ArrayList<Integer> trennideIDd = new ArrayList<>();
+        //ma pole kindel kas see töötab nii nagu ma plaanisin
+        //aga see peaks iga trenni id panema listi:
+        trenniAndmed.forEach((key, value) -> {
+            if (value.isEmpty()) ;
+            else {
+                for (Trenn mingiTrenn : value) {
+                    trennideIDd.add(Integer.parseInt(mingiTrenn.getId()));
+                }
+            }
+        });
+        //kontrollime et seda IDd ei oleks seal listis
+        while (trennideIDd.contains(id)) id = (int) (Math.random() * 1000);
+        //teeme uue trenni isendi
+        Trenn uusTrenn = new Trenn(String.valueOf(id), kestvus, nimi);
+        //lisame selle selle kuupäeva trennide listi
+        trenniAndmed.get(kuupäev).add(uusTrenn);
+
+    }
+
+    public void looUusKuupäev(String kuupäev) {
+        ArrayList<Trenn> mingidTrennid=new ArrayList<>();
+        trenniAndmed.put(kuupäev, mingidTrennid);
+    }
+
     private List<Andmeväli> loeAndmeväljadRekursiivselt(JSONObject praeguseVäljaInfo) {
         ArrayList<Andmeväli> andmeväljad = new ArrayList<>();
         JSONArray andmeväljadJson = praeguseVäljaInfo.getJSONArray("väljad");
 
         Iterator<Object> it = andmeväljadJson.iterator();
-        while(it.hasNext()) {
-            JSONObject väljaInfo = (JSONObject)it.next();
+        while (it.hasNext()) {
+            JSONObject väljaInfo = (JSONObject) it.next();
             String väljaNimi = väljaInfo.getString("nimi");
             String väärtus = väljaInfo.getString("väärtus");
 
             // rekursiivselt paneme kirja sisemised väljad
             List<Andmeväli> sisemisedVäljad = null;
-            if(!väljaInfo.isNull("väljad"))
+            if (!väljaInfo.isNull("väljad"))
                 sisemisedVäljad = this.loeAndmeväljadRekursiivselt(väljaInfo);
 
             Andmeväli väli = new Andmeväli(väljaNimi, väärtus, sisemisedVäljad);
@@ -39,12 +67,12 @@ public class Andmebaas {
         return andmeväljad;
     }
 
-  	public void laeAndmebaas() throws FileNotFoundException {
+    public void laeAndmebaas() throws FileNotFoundException {
         JSONTokener jsonFail = new JSONTokener(new FileReader(ANDMEBAASI_FAIL));
 
         // vaatame kõik kuupäevad andmebaasis läbi
         JSONObject kuupäevadKoosTrennidega = new JSONObject(jsonFail);
-        for(String kuupäev : kuupäevadKoosTrennidega.keySet()) {
+        for (String kuupäev : kuupäevadKoosTrennidega.keySet()) {
             this.trenniAndmed.put(kuupäev, new ArrayList<>());
 
             // vaatame läbi kõik trennid, mis sel kuupäeval tegime
@@ -69,11 +97,11 @@ public class Andmebaas {
 
     private JSONArray väljaObjektidJsoniks(List<Andmeväli> väljad) {
         JSONArray väljadJson = new JSONArray();
-        for(Andmeväli andmed : väljad) {
+        for (Andmeväli andmed : väljad) {
             JSONObject andmedJson = new JSONObject();
             andmedJson.put("nimi", andmed.getNimi());
             andmedJson.put("väärtus", andmed.getVäärtus());
-            if(andmed.getSisemisedVäljad() != null)
+            if (andmed.getSisemisedVäljad() != null)
                 andmedJson.put("väljad", this.väljaObjektidJsoniks(andmed.getSisemisedVäljad()));
             else
                 andmedJson.put("väljad", JSONObject.NULL);
@@ -84,9 +112,10 @@ public class Andmebaas {
 
         return väljadJson;
     }
+
     private JSONArray trenniObjektidJsoniks(List<Trenn> trennid) {
         JSONArray trennidJson = new JSONArray();
-        for(Trenn trenn : trennid) {
+        for (Trenn trenn : trennid) {
             JSONObject trenniJson = new JSONObject();
             trenniJson.put("id", trenn.getId());
             trenniJson.put("nimi", trenn.getNimi());
@@ -102,7 +131,7 @@ public class Andmebaas {
     public void salvestaAndmebaas() throws java.io.IOException {
         // Java objektide muundamine JSONiks
         JSONObject uusAndmebaas = new JSONObject();
-        for(String kuupäev : this.trenniAndmed.keySet()) {
+        for (String kuupäev : this.trenniAndmed.keySet()) {
             List<Trenn> trennid = this.trenniAndmed.get(kuupäev);
             uusAndmebaas.put(kuupäev, this.trenniObjektidJsoniks(trennid));
         }
@@ -119,6 +148,14 @@ public class Andmebaas {
     public static void main(String[] args) throws Exception {
         Andmebaas andmed = new Andmebaas();
         andmed.laeAndmebaas();
+
+        //need andmed on nüüd andmebaasis:
+        //andmed.looUusKuupäev("2023-03-18");
+        //andmed.lisaTrenn("2023-03-18", "Jalutamine", "80min");
+        //andmed.looUusKuupäev("2023-02-28");
+        //andmed.lisaTrenn("2023-02-28", "Jõutrenn", "60min");
+        //andmed.lisaTrenn("2023-04-05", "Jooks", "30min");
+
         andmed.salvestaAndmebaas();
     }
 }

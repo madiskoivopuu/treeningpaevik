@@ -1,16 +1,1 @@
-{
-  "2023-04-05": [
-    {
-      "id": "a7",
-      "kestvus": "50min",
-      "nimi": "Jooks",
-      "väljad": [
-        {
-          "nimi": "km",
-          "väärtus": "5",
-          "väljad": null
-        }
-      ]
-    }
-  ]
-}
+{"2023-03-18":[{"nimi":"Jalutamine","väljad":[],"kestvus":"80min","id":"910"}],"2023-02-28":[{"nimi":"Jõutrenn","väljad":[],"kestvus":"60min","id":"212"}],"2023-04-05":[{"nimi":"Jooks","väljad":[{"nimi":"km","väärtus":"5","väljad":null}],"kestvus":"50min","id":"7"},{"nimi":"Jooks","väljad":[],"kestvus":"30min","id":"20"}]}
