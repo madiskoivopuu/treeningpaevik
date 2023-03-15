@@ -14,8 +14,16 @@ public class Andmeväli {
         return nimi;
     }
 
+    public void setNimi(String nimi) {
+        this.nimi = nimi;
+    }
+
     public String getVäärtus() {
         return väärtus;
+    }
+
+    public void setVäärtus(String väärtus) {
+        this.väärtus = väärtus;
     }
 
     public List<Andmeväli> getSisemisedVäljad() {

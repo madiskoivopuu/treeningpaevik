@@ -16,14 +16,17 @@ public class Andmebaas {
         this.trenniAndmed = new HashMap<>();
     }
 
-    public void lisaTrenn(String kuupäev, String nimi, String kestvus) {
+    public boolean lisaTrenn(String kuupäev, String nimi, String kestvus) {
+        if(!this.trenniAndmed.containsKey(kuupäev))
+            return false;
+
         //loome uue random ID et seda trenniga koos kasutada (panin kolmekohalise sest siis on vast piisavalt palju trenne võimalik lisada)
         int id = (int) (Math.random() * 1000);
         //loome juba kasutusel olevate IDde listi
         ArrayList<Integer> trennideIDd = new ArrayList<>();
         //ma pole kindel kas see töötab nii nagu ma plaanisin
         //aga see peaks iga trenni id panema listi:
-        trenniAndmed.forEach((key, value) -> {
+        this.trenniAndmed.forEach((key, value) -> {
             if (value.isEmpty()) ;
             else {
                 for (Trenn mingiTrenn : value) {
@@ -36,13 +39,34 @@ public class Andmebaas {
         //teeme uue trenni isendi
         Trenn uusTrenn = new Trenn(String.valueOf(id), kestvus, nimi);
         //lisame selle selle kuupäeva trennide listi
-        trenniAndmed.get(kuupäev).add(uusTrenn);
+        this.trenniAndmed.get(kuupäev).add(uusTrenn);
+        return true;
+    }
 
+    public boolean kustutaTrenn(String kuupäev, String id) {
+        return false;
+    }
+
+    public List<Trenn> tagastaTrennidKuupäeval(String kuupäev) {
+        if(!this.trenniAndmed.containsKey(kuupäev))
+            return null;
+
+        return this.trenniAndmed.get(kuupäev);
     }
 
     public void looUusKuupäev(String kuupäev) {
-        ArrayList<Trenn> mingidTrennid=new ArrayList<>();
-        trenniAndmed.put(kuupäev, mingidTrennid);
+        ArrayList<Trenn> mingidTrennid = new ArrayList<>();
+        this.trenniAndmed.put(kuupäev, mingidTrennid);
+    }
+
+    public boolean kustutaKuupäev(String kuupäev) {
+        return false;
+    }
+
+    public List<String> tagastaKõikKuupäevad() {
+        // tee loop hashmapi kõikidest võtmetest ja lisa need kuhugi arraysse
+        // kui näiteks kuupäevi pole, siis tagasta lihtsalt tühi arraylist
+        return null;
     }
 
     private List<Andmeväli> loeAndmeväljadRekursiivselt(JSONObject praeguseVäljaInfo) {
@@ -56,8 +80,8 @@ public class Andmebaas {
             String väärtus = väljaInfo.getString("väärtus");
 
             // rekursiivselt paneme kirja sisemised väljad
-            List<Andmeväli> sisemisedVäljad = null;
-            if (!väljaInfo.isNull("väljad"))
+            List<Andmeväli> sisemisedVäljad = new ArrayList<>();
+            if (!väljaInfo.getJSONArray("väljad").isEmpty())
                 sisemisedVäljad = this.loeAndmeväljadRekursiivselt(väljaInfo);
 
             Andmeväli väli = new Andmeväli(väljaNimi, väärtus, sisemisedVäljad);
@@ -101,10 +125,10 @@ public class Andmebaas {
             JSONObject andmedJson = new JSONObject();
             andmedJson.put("nimi", andmed.getNimi());
             andmedJson.put("väärtus", andmed.getVäärtus());
-            if (andmed.getSisemisedVäljad() != null)
+            if (andmed.getSisemisedVäljad().size() == 0)
                 andmedJson.put("väljad", this.väljaObjektidJsoniks(andmed.getSisemisedVäljad()));
             else
-                andmedJson.put("väljad", JSONObject.NULL);
+                andmedJson.put("väljad", new JSONArray());
 
             // lisame andmete Jsoni listi
             väljadJson.put(andmedJson);
