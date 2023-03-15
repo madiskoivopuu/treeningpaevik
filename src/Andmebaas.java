@@ -64,9 +64,13 @@ public class Andmebaas {
     }
 
     public List<String> tagastaKõikKuupäevad() {
-        // tee loop hashmapi kõikidest võtmetest ja lisa need kuhugi arraysse
-        // kui näiteks kuupäevi pole, siis tagasta lihtsalt tühi arraylist
-        return null;
+        //kõik kuupäevad uude listi
+        List<String> kõikKuupäevad=new ArrayList<>();
+        if (this.trenniAndmed.isEmpty()) return kõikKuupäevad;
+        this.trenniAndmed.forEach((key, value) -> {
+            kõikKuupäevad.add(key);
+        });
+        return kõikKuupäevad;
     }
 
     private List<Andmeväli> loeAndmeväljadRekursiivselt(JSONObject praeguseVäljaInfo) {
@@ -179,7 +183,7 @@ public class Andmebaas {
         //andmed.looUusKuupäev("2023-02-28");
         //andmed.lisaTrenn("2023-02-28", "Jõutrenn", "60min");
         //andmed.lisaTrenn("2023-04-05", "Jooks", "30min");
-
+        System.out.println(andmed.tagastaKõikKuupäevad());
         andmed.salvestaAndmebaas();
     }
 }
