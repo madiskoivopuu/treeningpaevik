@@ -41,4 +41,13 @@ public class Trenn {
     public void setPeamisedVäljad(List<Andmeväli> peamisedVäljad) {
         this.peamisedVäljad = peamisedVäljad;
     }
+
+    public Andmeväli leiaVäliIDga(String id) {
+        for(Andmeväli väli : this.peamisedVäljad) {
+            if(väli.getNimi() == id)
+                return väli;
+        }
+
+        return null;
+    }
 }

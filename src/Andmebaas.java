@@ -44,7 +44,11 @@ public class Andmebaas {
     }
 
     public boolean kustutaTrenn(String kuupäev, String id) {
-        return false;
+        if(!this.trenniAndmed.containsKey(kuupäev))
+            return false;
+
+        boolean eemaldati = this.trenniAndmed.get(kuupäev).removeIf(trenn -> trenn.getId() == id);
+        return eemaldati;
     }
 
     public List<Trenn> tagastaTrennidKuupäeval(String kuupäev) {
@@ -60,7 +64,7 @@ public class Andmebaas {
     }
 
     public boolean kustutaKuupäev(String kuupäev) {
-        return false;
+        return this.trenniAndmed.remove(kuupäev) != null;
     }
 
     public List<String> tagastaKõikKuupäevad() {
@@ -80,6 +84,7 @@ public class Andmebaas {
         Iterator<Object> it = andmeväljadJson.iterator();
         while (it.hasNext()) {
             JSONObject väljaInfo = (JSONObject) it.next();
+            String id = väljaInfo.getString("id");
             String väljaNimi = väljaInfo.getString("nimi");
             String väärtus = väljaInfo.getString("väärtus");
 
@@ -88,7 +93,7 @@ public class Andmebaas {
             if (!väljaInfo.getJSONArray("väljad").isEmpty())
                 sisemisedVäljad = this.loeAndmeväljadRekursiivselt(väljaInfo);
 
-            Andmeväli väli = new Andmeväli(väljaNimi, väärtus, sisemisedVäljad);
+            Andmeväli väli = new Andmeväli(id, väljaNimi, väärtus, sisemisedVäljad);
             andmeväljad.add(väli);
         }
 
@@ -127,6 +132,7 @@ public class Andmebaas {
         JSONArray väljadJson = new JSONArray();
         for (Andmeväli andmed : väljad) {
             JSONObject andmedJson = new JSONObject();
+            andmedJson.put("id", andmed.getId());
             andmedJson.put("nimi", andmed.getNimi());
             andmedJson.put("väärtus", andmed.getVäärtus());
             if (andmed.getSisemisedVäljad().size() == 0)

@@ -1,15 +1,20 @@
 import java.util.List;
 public class Andmeväli {
+    private String id;
     private String nimi;
     private String väärtus;
     private List<Andmeväli> sisemisedVäljad;
 
-    public Andmeväli(String nimi, String väärtus, List<Andmeväli> sisemisedVäljad) {
+    public Andmeväli(String id, String nimi, String väärtus, List<Andmeväli> sisemisedVäljad) {
+        this.id = id;
         this.nimi = nimi;
         this.väärtus = väärtus;
         this.sisemisedVäljad = sisemisedVäljad;
     }
 
+    public String getId() {
+        return id;
+    }
     public String getNimi() {
         return nimi;
     }
@@ -28,5 +33,14 @@ public class Andmeväli {
 
     public List<Andmeväli> getSisemisedVäljad() {
         return sisemisedVäljad;
+    }
+
+    public Andmeväli leiaVäliIDga(String id) {
+        for(Andmeväli väli : this.sisemisedVäljad) {
+            if(väli.getNimi() == id)
+                return väli;
+        }
+
+        return null;
     }
 }
