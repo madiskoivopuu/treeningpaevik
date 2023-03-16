@@ -58,9 +58,13 @@ public class Andmebaas {
         return this.trenniAndmed.get(kuupäev);
     }
 
-    public void looUusKuupäev(String kuupäev) {
+    public boolean looUusKuupäev(String kuupäev) {
+        if(this.trenniAndmed.containsKey(kuupäev)) // vana kuupäev kirjutatakse üle ilma selleta
+            return false;
+
         ArrayList<Trenn> mingidTrennid = new ArrayList<>();
         this.trenniAndmed.put(kuupäev, mingidTrennid);
+        return true;
     }
 
     public boolean kustutaKuupäev(String kuupäev) {
