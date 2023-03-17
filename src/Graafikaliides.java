@@ -26,7 +26,13 @@ public class Graafikaliides {
         } catch (Exception e) {}
     }
 
+    public static void kuvaTrennideEkraaniInfo(List<Trenn> trennid) {
+        kustutaCommandPromptiTekst();
+
+    }
     public static void trennideEkraan(List<Trenn> trennid) {
+        kuvaTrennideEkraaniInfo(trennid);
+
         while (true) {
 
         }
