@@ -47,14 +47,11 @@ public class Andmebaas {
         if(!this.trenniAndmed.containsKey(kuupäev))
             return false;
 
-        boolean eemaldati = this.trenniAndmed.get(kuupäev).removeIf(trenn -> trenn.getId() == id);
+        boolean eemaldati = this.trenniAndmed.get(kuupäev).removeIf(trenn -> trenn.getId().equals(id));
         return eemaldati;
     }
 
     public List<Trenn> tagastaTrennidKuupäeval(String kuupäev) {
-        if(!this.trenniAndmed.containsKey(kuupäev))
-            return null;
-
         return this.trenniAndmed.get(kuupäev);
     }
 
