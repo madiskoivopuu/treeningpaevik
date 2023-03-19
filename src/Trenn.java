@@ -14,6 +14,10 @@ public class Trenn {
         this.peamisedVäljad = new ArrayList<>();
     }
 
+    public String toString() {
+        return "[ID: " + this.id + "] " + this.nimi + " - " + this.kestvus;
+    }
+
     public String getId() {
         return id;
     }

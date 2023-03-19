@@ -7,9 +7,10 @@ import java.util.Objects;
 import java.util.Scanner;
 
 // tegeleb käskude töötlemisega ja command line asjadega
+// TODO: lisada andmete salvestamine kui programm kinni panna
 public class Graafikaliides {
     private static final Scanner kasutajaInput = new Scanner(System.in);
-    private static Trenn viimatiValitudTrenn = null;
+    private static Andmebaas andmebaas = null;
 
     public static void kustutaCommandPromptiTekst() {
         try {
@@ -25,74 +26,12 @@ public class Graafikaliides {
         }
     }
 
-    public static void kuvaTrennideEkraaniInfo(List<Trenn> trennid) {
-        kustutaCommandPromptiTekst();
-        System.out.println("Oled teinud järgmiseid trenne:");
-        for (Trenn trenn : trennid) {
-            System.out.println(trenn.getNimi() + ", ID: " + trenn.getId());
-        }
-        System.out.println();
-
-        System.out.println("> Käsud: ");
-        System.out.println("> V ID - valib trenni ning näitab selle sisu");
-        System.out.println("> Q - sulgeb programmi");
-        System.out.println();
-
+    public static void kuvaRekursiivseltSisemisedAndmeväljad(Andmeväli andmed, int sügavus) {
+        System.out.println("--".repeat(sügavus) + "-> " + andmed);
+        if(andmed.getSisemisedVäljad() != null && andmed.getSisemisedVäljad().size() != 0)
+            for(Andmeväli sisemisedAndmed : andmed.getSisemisedVäljad())
+                kuvaRekursiivseltSisemisedAndmeväljad(sisemisedAndmed, sügavus+1);
     }
-
-    public static void trennideEkraan(List<Trenn> trennid) {
-        kuvaTrennideEkraaniInfo(trennid);
-
-        while (true) {
-            System.out.print("Sisesta käsk: ");
-            String käsk = kasutajaInput.nextLine();
-            System.out.println();
-
-            if (käsk.equals("")) {
-                kuvaTrennideEkraaniInfo(trennid);
-                System.out.println("Tühja käsku ei eksisteeri.");
-                continue;
-            }
-            String[] käskJaArgumendid = käsk.split(" ");
-            switch (käskJaArgumendid[0].toUpperCase()) {
-                case "V" -> {
-                    if (käskJaArgumendid.length != 2) {
-                        kuvaTrennideEkraaniInfo(trennid);
-                        System.out.println("Käsul V peab olema täpselt üks ID argument.");
-                        continue;
-                    }
-
-                    for (Trenn trenn : trennid) {
-                        //otsib listist õige IDga trenni üles
-                        if (Objects.equals(trenn.getId(), käskJaArgumendid[1])) {
-                            System.out.println("Valisite trenni:");
-                            System.out.println(trenn.getNimi() + ", kestvus: " + trenn.getKestvus() + ", ID: " + trenn.getId());
-                            //teeb sisemiste andmete listi
-                            List<Andmeväli> selleTrenniAndmeväljad = trenn.getPeamisedVäljad();
-                            //kui see on tühi siis annab sellest teada ja viib esialgsete trennide juurde tagasi
-                            if (selleTrenniAndmeväljad.isEmpty()) {
-                                System.out.println("Sellel trennil pole rohkem infot.");
-                                System.out.println();
-                                System.out.println("Viime su valitud kuupäeva trennide juurde tagasi.");
-                                kuvaTrennideEkraaniInfo(trennid);
-                            } else {
-                                //muul juhul näitab mis andmed sellel trennil veel on
-                                andmeväljadeEkraan(selleTrenniAndmeväljad);
-                            }
-                        }
-                    }
-                }
-                case "Q" -> {
-                    System.exit(0);
-                }
-                default -> {
-                    kuvaTrennideEkraaniInfo(trennid);
-                    System.out.println("Sellist käsku ei eksisteeri.");
-                }
-            }
-        }
-    }
-
 
     public static void kuvaSisemisteAndmeteInfo(List<Andmeväli> andmeväljad) {
         kustutaCommandPromptiTekst();
@@ -103,10 +42,14 @@ public class Graafikaliides {
         System.out.println();
         System.out.println("> Käsud: ");
         System.out.println("> V ID - valib sisemise info ning näitab selle sisu");
+        System.out.println("> K ID - kustutab andmevälja");
+        System.out.println("> B - läheb tagasi eelmisele ekraanile");
+        System.out.println("> BT - läheb tagasi trenni juurde");
         System.out.println("> Q - sulgeb programmi");
         System.out.println();
     }
-    public static void andmeväljadeEkraan(List<Andmeväli> andmeväljad){
+
+    public static String andmeväljadeEkraan(List<Andmeväli> andmeväljad){
         kuvaSisemisteAndmeteInfo(andmeväljad);
         while (true){
             System.out.print("Sisesta käsk: ");
@@ -130,18 +73,18 @@ public class Graafikaliides {
                     //otsib üles valitud IDga andmevälja
                     for (Andmeväli andmeväli:andmeväljad) {
                         if (andmeväli.getId().equals(käskJaArgumendid[1])){
-                            //kui sellel andmeväljal rohkem infot pole annab teada ja viib sama trenni eelmise sisu juurde tagasi
-                            if (andmeväli.getSisemisedVäljad().isEmpty()){
-                                System.out.println("Sellel trennil ei ole rohkem infot");
-                                System.out.println();
-                                System.out.println("Viime su trenni eelmise sisu juurde tagasi.");
-                                System.out.println();
-                                andmeväljadeEkraan(andmeväljad);
-                            }
                             //muul juhul hakkab rekursiivselt(?) järjest sisemisi välju kuvama kui neid leidub ja inimene neid valib
-                            andmeväljadeEkraan(andmeväli.getSisemisedVäljad());
+                            String viimaneKäsk = andmeväljadeEkraan(andmeväli.getSisemisedVäljad());
+                            if(viimaneKäsk.equals("BT")) {
+                                return "BT"; // väljub igast tsüklist niikaua kuni jõuame tagasi trennini
+                            }
+
+                            continue;
                         }
                     }
+                }
+                case "BT" -> {
+                    return "BT";
                 }
                 case "Q" -> {
                     System.exit(0);
@@ -154,20 +97,178 @@ public class Graafikaliides {
         }
     }
 
-    public static void kuvaKuupäevaEkraaniInfo(Andmebaas andmed) {
+    public static void kuvaKindlaTrenniEkraaniInfo(Trenn trenn) {
+        System.out.println("*************************************************");
+        System.out.println("*                                               *");
+        System.out.println("*                                               *");
+        System.out.println("*              Treeningpäevik                   *");
+        System.out.println("*                                               *");
+        System.out.println("*                                               *");
+        System.out.println("*************************************************");
+
+        System.out.println(trenn);
+        if(trenn.getPeamisedVäljad().size() == 0)
+            System.out.println("Sellel trennil pole rohkem infot.");
+        else
+            for(Andmeväli andmed : trenn.getPeamisedVäljad())
+                kuvaRekursiivseltSisemisedAndmeväljad(andmed, 0);
+
+        System.out.println("> V ID - vaata mingit kindlat andmevälja");
+        System.out.println("> MN uusNimi - muuda trenni nime");
+        System.out.println("> MK uusKestvus - muuda trenni kestvust (ajaühik sisesta ise)");
+        System.out.println("> K ID - kustutab andmevälja");
+        System.out.println("> K trenniNimi - kustutab praeguse trenni andmed");
+    }
+    public static void kindlaTrenniEkraan(String kuupäev, Trenn trenn) {
+        kuvaKindlaTrenniEkraaniInfo(trenn);
+
+        while (true) {
+            System.out.print("Sisesta käsk: ");
+            String käsk = kasutajaInput.nextLine();
+            System.out.println();
+
+            if (käsk.equals("")) {
+                kuvaKindlaTrenniEkraaniInfo(trenn);
+                System.out.println("Tühja käsku ei eksisteeri.");
+                continue;
+            }
+            String[] käskJaArgumendid = käsk.split(" ");
+            switch (käskJaArgumendid[0].toUpperCase()) {
+                case "V" -> {
+
+                }
+                case "MN" -> {
+                    if (käskJaArgumendid.length != 2) {
+                        kuvaKindlaTrenniEkraaniInfo(trenn);
+                        System.out.println("Käsul MN peab olema täpselt üks uue nime argument.");
+                        continue;
+                    }
+                }
+                case "MK" -> {
+                    if (käskJaArgumendid.length < 2) {
+                        kuvaKindlaTrenniEkraaniInfo(trenn);
+                        System.out.println("Käsul MK peab olema täpselt üks uue kestvuse argument.");
+                        continue;
+                    }
+                    // uus nimi võib koosneda mitmest sõnast, peame stringi kokku ühendama
+                    //String uusNimi = String.join(" ", " ", " ", käskJaArgumendid, käskJaArgumendid.length); // retarded compileri error
+                    //trenn.setNimi(käskJaArgumendid);
+                }
+                case "K" -> {
+                    if (käskJaArgumendid.length != 2) {
+                        kuvaKindlaTrenniEkraaniInfo(trenn);
+                        System.out.println("Käsul V peab olema täpselt üks ID argument.");
+                        continue;
+                    }
+
+                    if(käskJaArgumendid[1].equals(trenn.getNimi())) { // tahetakse kustutada trenni
+                        // ...
+                        // siin vast lihtsalt returnib tagasi trennide ekraanile
+                    } else {
+
+                    }
+                }
+            }
+        }
+    }
+
+    public static void kuvaTrennideEkraaniInfo(String kuupäev, List<Trenn> trennid) {
+        kustutaCommandPromptiTekst();
+
+        // arvutused kuupäeva info keskele panemiseks
+        // https://stackoverflow.com/questions/16629476/how-to-center-a-print-statement-text
+        String kuupäevaInfo = "Valitud kuupäev: " + kuupäev;
+        String rida = "                                               ";
+        int nihe = (rida.length()-kuupäevaInfo.length())/2;
+        String kuupäevaPrint = "*%" + nihe + "s%s%" + nihe + "s*\n";
+
+        System.out.println("*************************************************");
+        System.out.println("*                                               *");
+        System.out.println("*              Treeningpäevik                   *");
+        System.out.println("*                                               *");
+        System.out.printf(kuupäevaPrint, " ", kuupäevaInfo, " ");
+        System.out.println("*                                               *");
+        System.out.println("*************************************************");
+
+        System.out.println("Oled teinud järgmiseid trenne:");
+        for (Trenn trenn : trennid) {
+            System.out.println(trenn);
+        }
+        System.out.println();
+
+        System.out.println("> Käsud: ");
+        System.out.println("> V ID - valib trenni ning näitab selle sisu");
+        System.out.println("> L nimi ||| kestvus  - lisab trenni, kindlasti pange nime ja kestvuse vahele |||");
+        System.out.println("> B - läheb tagasi eelmisele ekraanile");
+        System.out.println("> Q - sulgeb programmi");
+        System.out.println();
+
+    }
+
+    public static void trennideEkraan(String kuupäev, List<Trenn> trennid) {
+        kuvaTrennideEkraaniInfo(kuupäev, trennid);
+
+        while (true) {
+            System.out.print("Sisesta käsk: ");
+            String käsk = kasutajaInput.nextLine();
+            System.out.println();
+
+            if (käsk.equals("")) {
+                kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                System.out.println("Tühja käsku ei eksisteeri.");
+                continue;
+            }
+            String[] käskJaArgumendid = käsk.split(" ");
+            switch (käskJaArgumendid[0].toUpperCase()) {
+                case "V" -> {
+                    if (käskJaArgumendid.length != 2) {
+                        kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                        System.out.println("Käsul V peab olema täpselt üks ID argument.");
+                        continue;
+                    }
+
+                    for (Trenn trenn : trennid) {
+                        //otsib listist õige IDga trenni üles
+                        if (trenn.getId().equals(käskJaArgumendid[1])) {
+                            kindlaTrenniEkraan(kuupäev, trenn);
+                            continue;
+                        }
+                    }
+
+                    kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                    System.out.println("Sellise ID-ga trenni ei leitud.");
+                    continue;
+                }
+                case "B" -> {
+                    return; // naaseb tagasi kuupäevade ekraanile
+                }
+                case "Q" -> {
+                    System.exit(0);
+                }
+                default -> {
+                    kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                    System.out.println("Sellist käsku ei eksisteeri.");
+                }
+            }
+        }
+    }
+
+    public static void kuvaKuupäevaEkraaniInfo() {
         // https://stackoverflow.com/questions/2979383/how-to-clear-the-console
         kustutaCommandPromptiTekst();
 
         System.out.println("*************************************************");
         System.out.println("*                                               *");
+        System.out.println("*                                               *");
         System.out.println("*              Treeningpäevik                   *");
+        System.out.println("*                                               *");
         System.out.println("*                                               *");
         System.out.println("*************************************************");
 
         System.out.println();
         System.out.println();
         System.out.println("Oled trenni teinud kuupäevadel: ");
-        for (String kuupäev : andmed.tagastaKõikKuupäevad()) {
+        for (String kuupäev : andmebaas.tagastaKõikKuupäevad()) {
             System.out.print(kuupäev + "  ");
         }
         System.out.println();
@@ -178,8 +279,8 @@ public class Graafikaliides {
         System.out.println();
     }
 
-    public static void kuupäevadeEkraan(Andmebaas andmed) {
-        kuvaKuupäevaEkraaniInfo(andmed);
+    public static void kuupäevadeEkraan() {
+        kuvaKuupäevaEkraaniInfo();
 
         while (true) {
             System.out.print("Sisesta käsk: ");
@@ -187,7 +288,7 @@ public class Graafikaliides {
             System.out.println();
 
             if (käsk.equals("")) {
-                kuvaKuupäevaEkraaniInfo(andmed);
+                kuvaKuupäevaEkraaniInfo();
                 System.out.println("Tühja käsku ei eksisteeri.");
                 continue;
             }
@@ -196,25 +297,26 @@ public class Graafikaliides {
             switch (käskJaArgumendid[0].toUpperCase()) {
                 case "V" -> {
                     if (käskJaArgumendid.length != 2) {
-                        kuvaKuupäevaEkraaniInfo(andmed);
+                        kuvaKuupäevaEkraaniInfo();
                         System.out.println("Käsul V peab olema täpselt üks kuupäeva argument.");
                         continue;
                     }
 
-                    List<Trenn> trennid = andmed.tagastaTrennidKuupäeval(käskJaArgumendid[1]);
+                    List<Trenn> trennid = andmebaas.tagastaTrennidKuupäeval(käskJaArgumendid[1]);
                     if (trennid == null) {
-                        kuvaKuupäevaEkraaniInfo(andmed);
+                        kuvaKuupäevaEkraaniInfo();
                         System.out.println("Sellist kuupäeva ei eksisteeri.");
                         continue;
                     }
 
-                    trennideEkraan(trennid);
+                    trennideEkraan(käskJaArgumendid[1], trennid);
+                    kuvaKuupäevaEkraaniInfo(); // selleks, et peale sellele ekraanile tagasi tulekut oleks kuupäevade ekraani käsud nähtaval
                 }
                 case "Q" -> {
-                    return;
+                    System.exit(0);
                 }
                 default -> {
-                    kuvaKuupäevaEkraaniInfo(andmed);
+                    kuvaKuupäevaEkraaniInfo();
                     System.out.println("Sellist käsku ei eksisteeri.");
                 }
             }
@@ -222,9 +324,9 @@ public class Graafikaliides {
     }
 
     public static void main(String[] args) {
-        Andmebaas andmed = new Andmebaas();
+        andmebaas = new Andmebaas();
         try {
-            andmed.laeAndmebaas();
+            andmebaas.laeAndmebaas();
         } catch (FileNotFoundException e) {
             System.out.println("HOIATUS: Andmebaasi faili ei eksisteerinud, programm loob automaatselt uue.");
             File fail = new File(Andmebaas.ANDMEBAASI_FAIL);
@@ -241,6 +343,6 @@ public class Graafikaliides {
             }
         }
 
-        kuupäevadeEkraan(andmed);
+        kuupäevadeEkraan();
     }
 }

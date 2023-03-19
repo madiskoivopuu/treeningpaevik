@@ -12,6 +12,10 @@ public class Andmeväli {
         this.sisemisedVäljad = sisemisedVäljad;
     }
 
+    public String toString() {
+        return this.nimi + " - " + this.väärtus + " (ID: " + this.id + ")";
+    }
+
     public String getId() {
         return id;
     }
