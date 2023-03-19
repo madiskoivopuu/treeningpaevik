@@ -32,16 +32,32 @@ public class Graafikaliides {
             for(Andmeväli sisemisedAndmed : andmed.getSisemisedVäljad())
                 kuvaRekursiivseltSisemisedAndmeväljad(sisemisedAndmed, sügavus+1);
     }
-
-    public static void kuvaSisemisteAndmeteInfo(List<Andmeväli> andmeväljad) {
-        kustutaCommandPromptiTekst();
-        System.out.println("Sellel trennil on sisemised andmed:");
-        for (Andmeväli andmeväli : andmeväljad) {
-            System.out.println(andmeväli.getNimi() + ", " + andmeväli.getVäärtus() + ", ID: " + andmeväli.getId());
+    public static Andmeväli väljastaSisemisteAndmeteInfoEkraanile(List<Andmeväli> andmeväljad, String id){
+        //otsib rekursiivselt selle id üles mida sisestati ning väljastab ingo ekraanile ja tagastab selle välja
+        for (Andmeväli väli:andmeväljad) {
+            if (väli.getId().equals(id)){
+                System.out.println(väli);
+                return väli;
+            }
+            else{
+                if (!väli.getSisemisedVäljad().isEmpty()) return väljastaSisemisteAndmeteInfoEkraanile(väli.getSisemisedVäljad(), id);
+            }
         }
+        return null;
+    }
+    public static void kuvaSisemisteAndmeteInfo(Andmeväli andmeväli) {
+        kustutaCommandPromptiTekst();
+        System.out.println("*************************************************");
+        System.out.println("*                                               *");
+        System.out.println("*              Treeningpäevik                   *");
+        System.out.println("*                                               *");
+        System.out.println("*              Valitud ID: "+andmeväli.getId()+" ".repeat(21-andmeväli.getId().length())+"*");
+        System.out.println("*                                               *");
+        System.out.println("*************************************************");
+
         System.out.println();
         System.out.println("> Käsud: ");
-        System.out.println("> V ID - valib sisemise info ning näitab selle sisu");
+        //System.out.println("> V ID - valib sisemise info ning näitab selle sisu");
         System.out.println("> K ID - kustutab andmevälja");
         System.out.println("> B - läheb tagasi eelmisele ekraanile");
         System.out.println("> BT - läheb tagasi trenni juurde");
@@ -49,22 +65,26 @@ public class Graafikaliides {
         System.out.println();
     }
 
-    public static String andmeväljadeEkraan(List<Andmeväli> andmeväljad){
-        kuvaSisemisteAndmeteInfo(andmeväljad);
+
+    public static String andmeväljadeEkraan(Andmeväli andmeväli){
+        kuvaSisemisteAndmeteInfo(andmeväli);
         while (true){
             System.out.print("Sisesta käsk: ");
             String käsk = kasutajaInput.nextLine();
             System.out.println();
 
             if (käsk.equals("")) {
-                kuvaSisemisteAndmeteInfo(andmeväljad);
+                kuvaSisemisteAndmeteInfo(andmeväli);
                 System.out.println("Tühja käsku ei eksisteeri.");
                 continue;
             }
 
             String[] käskJaArgumendid = käsk.split(" ");
             switch (käskJaArgumendid[0].toUpperCase()) {
-                case "V" -> {
+                //siin pole nagu vaja V-d sest juba sai valitud see mida sooviti
+                //ning kui mitte siis läheb lis ühe võrra tagasi ja valib mis tahtis?
+
+                /*case "V" -> {
                     if (käskJaArgumendid.length != 2) {
                         kuvaSisemisteAndmeteInfo(andmeväljad);
                         System.out.println("Käsul V peab olema täpselt üks ID argument.");
@@ -78,10 +98,13 @@ public class Graafikaliides {
                             if(viimaneKäsk.equals("BT")) {
                                 return "BT"; // väljub igast tsüklist niikaua kuni jõuame tagasi trennini
                             }
-
                             continue;
                         }
                     }
+                }*/
+
+                case "B" -> {
+                    return "B";
                 }
                 case "BT" -> {
                     return "BT";
@@ -90,7 +113,7 @@ public class Graafikaliides {
                     System.exit(0);
                 }
                 default -> {
-                    kuvaSisemisteAndmeteInfo(andmeväljad);
+                    kuvaSisemisteAndmeteInfo(andmeväli);
                     System.out.println("Sellist käsku ei eksisteeri.");
                 }
             }
@@ -112,12 +135,14 @@ public class Graafikaliides {
         else
             for(Andmeväli andmed : trenn.getPeamisedVäljad())
                 kuvaRekursiivseltSisemisedAndmeväljad(andmed, 0);
-
+        System.out.println();
         System.out.println("> V ID - vaata mingit kindlat andmevälja");
         System.out.println("> MN uusNimi - muuda trenni nime");
         System.out.println("> MK uusKestvus - muuda trenni kestvust (ajaühik sisesta ise)");
         System.out.println("> K ID - kustutab andmevälja");
         System.out.println("> K trenniNimi - kustutab praeguse trenni andmed");
+        System.out.println("> Q - sulgeb programmi");
+        System.out.println();
     }
     public static void kindlaTrenniEkraan(String kuupäev, Trenn trenn) {
         kuvaKindlaTrenniEkraaniInfo(trenn);
@@ -135,7 +160,13 @@ public class Graafikaliides {
             String[] käskJaArgumendid = käsk.split(" ");
             switch (käskJaArgumendid[0].toUpperCase()) {
                 case "V" -> {
-
+                    List<Andmeväli> trenniPeamisedAndmeväljad=trenn.getPeamisedVäljad();
+                    Andmeväli valitudVäli=väljastaSisemisteAndmeteInfoEkraanile(trenniPeamisedAndmeväljad, käskJaArgumendid[1]);
+                    if (valitudVäli==null){
+                        kuvaKindlaTrenniEkraaniInfo(trenn);
+                        System.out.println("Sellist IDd ei leidu.");
+                    }
+                    andmeväljadeEkraan(valitudVäli);
                 }
                 case "MN" -> {
                     if (käskJaArgumendid.length != 2) {
@@ -167,6 +198,9 @@ public class Graafikaliides {
                     } else {
 
                     }
+                }
+                case "Q" -> {
+                    System.exit(0);
                 }
             }
         }

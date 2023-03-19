@@ -47,4 +47,5 @@ public class Andmeväli {
 
         return null;
     }
+
 }
