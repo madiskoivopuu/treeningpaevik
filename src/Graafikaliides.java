@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Scanner;
 
 // tegeleb käskude töötlemisega ja command line asjadega
-// TODO: lisada andmete salvestamine kui programm kinni panna
 public class Graafikaliides {
     private static final Scanner kasutajaInput = new Scanner(System.in);
     private static Andmebaas andmebaas = null;
@@ -26,6 +25,22 @@ public class Graafikaliides {
         }
     }
 
+    public static void salvestaJaSulgeProgramm() {
+        for(int proov = 0; proov < 3; proov++) {
+            try {
+                andmebaas.salvestaAndmebaas();
+                System.exit(0);
+            } catch (java.io.IOException e) {
+                System.out.println("Andmebaasi ei suudetud salvestada");
+                System.out.println("Java veateade: " + e.getMessage());
+            }
+        }
+
+        // programm läheb normaalselt for tsükli sees kinni, kui mitte siis järgmine kood läheb käima
+        System.out.println("Peale kolme katset ei suudetud andmebaasi ikka faili salvestada.");
+        System.out.println("Lugege veateadet ning proovige hiljem uuesti, programm praegu ei sulgu.");
+    }
+
     public static void kuvaRekursiivseltSisemisedAndmeväljad(Andmeväli andmed, int sügavus) {
         System.out.println("--".repeat(sügavus) + "-> " + andmed);
         if(andmed.getSisemisedVäljad() != null && andmed.getSisemisedVäljad().size() != 0)
@@ -33,7 +48,7 @@ public class Graafikaliides {
                 kuvaRekursiivseltSisemisedAndmeväljad(sisemisedAndmed, sügavus+1);
     }
     public static Andmeväli väljastaSisemisteAndmeteInfoEkraanile(List<Andmeväli> andmeväljad, String id){
-        //otsib rekursiivselt selle id üles mida sisestati ning väljastab ingo ekraanile ja tagastab selle välja
+        //otsib rekursiivselt selle id üles mida sisestati ning väljastab info ekraanile ja tagastab selle välja
         for (Andmeväli väli:andmeväljad) {
             if (väli.getId().equals(id)){
                 System.out.println(väli);
@@ -110,7 +125,7 @@ public class Graafikaliides {
                     return "BT";
                 }
                 case "Q" -> {
-                    System.exit(0);
+                    salvestaJaSulgeProgramm();
                 }
                 default -> {
                     kuvaSisemisteAndmeteInfo(andmeväli);
@@ -165,25 +180,38 @@ public class Graafikaliides {
                     if (valitudVäli==null){
                         kuvaKindlaTrenniEkraaniInfo(trenn);
                         System.out.println("Sellist IDd ei leidu.");
+                        continue;
                     }
                     andmeväljadeEkraan(valitudVäli);
                 }
                 case "MN" -> {
-                    if (käskJaArgumendid.length != 2) {
+                    if (käskJaArgumendid.length < 2) {
                         kuvaKindlaTrenniEkraaniInfo(trenn);
-                        System.out.println("Käsul MN peab olema täpselt üks uue nime argument.");
+                        System.out.println("Käsul MN peab olema vähemalt üks sõna uue nimena.");
                         continue;
                     }
+
+                    // uus nimi võib koosneda mitmest sõnast, peame stringi kokku ühendama ja käsu eemaldama
+                    String uusNimi = String.join(" ", käskJaArgumendid);
+                    uusNimi = uusNimi.substring(2);
+                    trenn.setNimi(uusNimi);
+
+                    // väljastame uue info ekraanile
+                    kuvaKindlaTrenniEkraaniInfo(trenn);
                 }
                 case "MK" -> {
                     if (käskJaArgumendid.length < 2) {
                         kuvaKindlaTrenniEkraaniInfo(trenn);
-                        System.out.println("Käsul MK peab olema täpselt üks uue kestvuse argument.");
+                        System.out.println("Käsul MK peab olema vähemalt üks sõna/number kestvuse jaoks.");
                         continue;
                     }
-                    // uus nimi võib koosneda mitmest sõnast, peame stringi kokku ühendama
-                    //String uusNimi = String.join(" ", " ", " ", käskJaArgumendid, käskJaArgumendid.length); // retarded compileri error
-                    //trenn.setNimi(käskJaArgumendid);
+                    // sama mis MN käsus
+                    String uusKestvus = String.join(" ", käskJaArgumendid);
+                    uusKestvus = uusKestvus.substring(2);
+                    trenn.setKestvus(uusKestvus);
+
+                    // väljastame uue info ekraanile
+                    kuvaKindlaTrenniEkraaniInfo(trenn);
                 }
                 case "K" -> {
                     if (käskJaArgumendid.length != 2) {
@@ -200,7 +228,7 @@ public class Graafikaliides {
                     }
                 }
                 case "Q" -> {
-                    System.exit(0);
+                    salvestaJaSulgeProgramm();
                 }
             }
         }
@@ -277,7 +305,7 @@ public class Graafikaliides {
                     return; // naaseb tagasi kuupäevade ekraanile
                 }
                 case "Q" -> {
-                    System.exit(0);
+                    salvestaJaSulgeProgramm();
                 }
                 default -> {
                     kuvaTrennideEkraaniInfo(kuupäev, trennid);
@@ -347,7 +375,7 @@ public class Graafikaliides {
                     kuvaKuupäevaEkraaniInfo(); // selleks, et peale sellele ekraanile tagasi tulekut oleks kuupäevade ekraani käsud nähtaval
                 }
                 case "Q" -> {
-                    System.exit(0);
+                    salvestaJaSulgeProgramm();
                 }
                 default -> {
                     kuvaKuupäevaEkraaniInfo();
