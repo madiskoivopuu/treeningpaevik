@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Scanner;
 
 // tegeleb käskude töötlemisega ja command line asjadega
+
+//{"nimi":"km","väärtus":"6","väljad":[{"nimi":"km","väärtus":"7","väljad":[],"id":"345"}],"id":"123"}
 public class Graafikaliides {
     private static final Scanner kasutajaInput = new Scanner(System.in);
     private static Andmebaas andmebaas = null;
@@ -69,10 +71,21 @@ public class Graafikaliides {
         System.out.println("*              Valitud ID: "+andmeväli.getId()+" ".repeat(21-andmeväli.getId().length())+"*");
         System.out.println("*                                               *");
         System.out.println("*************************************************");
+        System.out.println();
+
+        if(andmeväli.getSisemisedVäljad().size() == 0)
+            System.out.println("Sellel väljal pole rohkem infot.");
+        else{
+            System.out.println("Sellel väljal on sisu:");
+            for(Andmeväli andmeväli1 : andmeväli.getSisemisedVäljad())
+                kuvaRekursiivseltSisemisedAndmeväljad(andmeväli1, 0);
+        }
+
+
 
         System.out.println();
         System.out.println("> Käsud: ");
-        //System.out.println("> V ID - valib sisemise info ning näitab selle sisu");
+        System.out.println("> V ID - valib sisemise info ning näitab selle sisu");
         System.out.println("> K ID - kustutab andmevälja");
         System.out.println("> B - läheb tagasi eelmisele ekraanile");
         System.out.println("> BT - läheb tagasi trenni juurde");
@@ -96,27 +109,17 @@ public class Graafikaliides {
 
             String[] käskJaArgumendid = käsk.split(" ");
             switch (käskJaArgumendid[0].toUpperCase()) {
-                //siin pole nagu vaja V-d sest juba sai valitud see mida sooviti
-                //ning kui mitte siis läheb lis ühe võrra tagasi ja valib mis tahtis?
-
-                /*case "V" -> {
+                case "V" -> {
                     if (käskJaArgumendid.length != 2) {
-                        kuvaSisemisteAndmeteInfo(andmeväljad);
+                        kuvaSisemisteAndmeteInfo(andmeväli);
                         System.out.println("Käsul V peab olema täpselt üks ID argument.");
                         continue;
                     }
-                    //otsib üles valitud IDga andmevälja
-                    for (Andmeväli andmeväli:andmeväljad) {
-                        if (andmeväli.getId().equals(käskJaArgumendid[1])){
-                            //muul juhul hakkab rekursiivselt(?) järjest sisemisi välju kuvama kui neid leidub ja inimene neid valib
-                            String viimaneKäsk = andmeväljadeEkraan(andmeväli.getSisemisedVäljad());
-                            if(viimaneKäsk.equals("BT")) {
-                                return "BT"; // väljub igast tsüklist niikaua kuni jõuame tagasi trennini
-                            }
-                            continue;
-                        }
-                    }
-                }*/
+                    List<Andmeväli> andmeteVäljad=andmeväli.getSisemisedVäljad();
+
+                    Andmeväli valitudVäli=väljastaSisemisteAndmeteInfoEkraanile(andmeteVäljad, käskJaArgumendid[1]);
+                    andmeväljadeEkraan(valitudVäli);
+                }
 
                 case "B" -> {
                     return "B";
