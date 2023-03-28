@@ -13,6 +13,12 @@ public class Graafikaliides {
     private static final Scanner kasutajaInput = new Scanner(System.in);
     private static Andmebaas andmebaas = null;
 
+    private static String viimaneKäsk = "";
+
+    public static void setViimaneKäsk(String viimaneKäsk) {
+        Graafikaliides.viimaneKäsk = viimaneKäsk;
+    }
+
     public static void kustutaCommandPromptiTekst() {
         try {
             final String os = System.getProperty("os.name");
@@ -28,7 +34,7 @@ public class Graafikaliides {
     }
 
     public static void salvestaJaSulgeProgramm() {
-        for(int proov = 0; proov < 3; proov++) {
+        for (int proov = 0; proov < 3; proov++) {
             try {
                 andmebaas.salvestaAndmebaas();
                 System.exit(0);
@@ -45,18 +51,19 @@ public class Graafikaliides {
 
     public static void kuvaRekursiivseltSisemisedAndmeväljad(Andmeväli andmed, int sügavus) {
         System.out.println("--".repeat(sügavus) + "-> " + andmed);
-        if(andmed.getSisemisedVäljad() != null && andmed.getSisemisedVäljad().size() != 0)
-            for(Andmeväli sisemisedAndmed : andmed.getSisemisedVäljad())
-                kuvaRekursiivseltSisemisedAndmeväljad(sisemisedAndmed, sügavus+1);
+        if (andmed.getSisemisedVäljad() != null && andmed.getSisemisedVäljad().size() != 0)
+            for (Andmeväli sisemisedAndmed : andmed.getSisemisedVäljad())
+                kuvaRekursiivseltSisemisedAndmeväljad(sisemisedAndmed, sügavus + 1);
     }
-    public static AndmeväliJaAsukoht leiaRekursiivseltAndmeväliIDga(List<Andmeväli> andmeväljad, String id){
+
+    public static AndmeväliJaAsukoht leiaRekursiivseltAndmeväliIDga(List<Andmeväli> andmeväljad, String id) {
         //otsib rekursiivselt selle id üles mida sisestati ning väljastab info ekraanile ja tagastab selle välja
-        for (Andmeväli väli:andmeväljad) {
-            if (väli.getId().equals(id)){
+        for (Andmeväli väli : andmeväljad) {
+            if (väli.getId().equals(id)) {
                 return new AndmeväliJaAsukoht(väli, andmeväljad);
-            }
-            else{
-                if (!väli.getSisemisedVäljad().isEmpty()) return leiaRekursiivseltAndmeväliIDga(väli.getSisemisedVäljad(), id);
+            } else {
+                if (!väli.getSisemisedVäljad().isEmpty())
+                    return leiaRekursiivseltAndmeväliIDga(väli.getSisemisedVäljad(), id);
             }
         }
         return null;
@@ -68,19 +75,18 @@ public class Graafikaliides {
         System.out.println("*                                               *");
         System.out.println("*              Treeningpäevik                   *");
         System.out.println("*                                               *");
-        System.out.println("*              Valitud ID: "+andmeväli.getId()+" ".repeat(21-andmeväli.getId().length())+"*");
+        System.out.println("*              Valitud ID: " + andmeväli.getId() + " ".repeat(21 - andmeväli.getId().length()) + "*");
         System.out.println("*                                               *");
         System.out.println("*************************************************");
         System.out.println();
 
-        if(andmeväli.getSisemisedVäljad().size() == 0)
+        if (andmeväli.getSisemisedVäljad().size() == 0)
             System.out.println("Sellel väljal pole rohkem infot.");
-        else{
+        else {
             System.out.println("Sellel väljal on sisu:");
-            for(Andmeväli andmeväli1 : andmeväli.getSisemisedVäljad())
+            for (Andmeväli andmeväli1 : andmeväli.getSisemisedVäljad())
                 kuvaRekursiivseltSisemisedAndmeväljad(andmeväli1, 0);
         }
-
 
 
         System.out.println();
@@ -94,9 +100,9 @@ public class Graafikaliides {
     }
 
 
-    public static String andmeväljadeEkraan(Andmeväli andmeväli){
+    public static String andmeväljadeEkraan(Andmeväli andmeväli) {
         kuvaSisemisteAndmeteInfo(andmeväli);
-        while (true){
+        while (true) {
             System.out.print("Sisesta käsk: ");
             String käsk = kasutajaInput.nextLine();
             System.out.println();
@@ -110,27 +116,44 @@ public class Graafikaliides {
             String[] käskJaArgumendid = käsk.split(" ");
             switch (käskJaArgumendid[0].toUpperCase()) {
                 case "V" -> {
+                    setViimaneKäsk("V");
                     if (käskJaArgumendid.length != 2) {
                         kuvaSisemisteAndmeteInfo(andmeväli);
                         System.out.println("Käsul V peab olema täpselt üks ID argument.");
                         continue;
                     }
-                    List<Andmeväli> andmeteVäljad=andmeväli.getSisemisedVäljad();
+                    List<Andmeväli> andmeteVäljad = andmeväli.getSisemisedVäljad();
 
                     AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(andmeteVäljad, käskJaArgumendid[1]);
-                    if (valik == null){
+                    if (valik == null) {
                         andmeväljadeEkraan(andmeväli);
                         System.out.println("Sellise ID-ga andmevälja ei leidu.");
                         continue;
                     }
-                    System.out.println(valik.andmeväli.getId());
+                    //System.out.println(valik.andmeväli.getId());
                     andmeväljadeEkraan(valik.andmeväli);
+
+                    if (Objects.equals(viimaneKäsk, "B")) {
+                        andmeväljadeEkraan(andmeväli);
+                        return "B";
+                    }
+                    if (Objects.equals(viimaneKäsk, "BT")) return "BT";
+
+
                 }
 
                 case "B" -> {
+                    /*if (Objects.equals(viimaneKäsk, "B")){
+                        andmeväljadeEkraan(andmeväli);
+                    }
+                    else {
+                        setViimaneKäsk("B");
+                    }*/
+                    setViimaneKäsk("B");
                     return "B";
                 }
                 case "BT" -> {
+                    setViimaneKäsk("BT");
                     return "BT";
                 }
                 case "Q" -> {
@@ -154,10 +177,10 @@ public class Graafikaliides {
         System.out.println("*************************************************");
 
         System.out.println(trenn);
-        if(trenn.getPeamisedVäljad().size() == 0)
+        if (trenn.getPeamisedVäljad().size() == 0)
             System.out.println("Sellel trennil pole rohkem infot.");
         else
-            for(Andmeväli andmed : trenn.getPeamisedVäljad())
+            for (Andmeväli andmed : trenn.getPeamisedVäljad())
                 kuvaRekursiivseltSisemisedAndmeväljad(andmed, 0);
         System.out.println();
         System.out.println("> V ID - vaata mingit kindlat andmevälja");
@@ -169,6 +192,7 @@ public class Graafikaliides {
         System.out.println("> Q - sulgeb programmi");
         System.out.println();
     }
+
     public static String kindlaTrenniEkraan(String kuupäev, Trenn trenn) {
         kuvaKindlaTrenniEkraaniInfo(trenn);
 
@@ -185,17 +209,24 @@ public class Graafikaliides {
             String[] käskJaArgumendid = käsk.split(" ");
             switch (käskJaArgumendid[0].toUpperCase()) {
                 case "V" -> {
-                    List<Andmeväli> trenniPeamisedAndmeväljad=trenn.getPeamisedVäljad();
+                    setViimaneKäsk("V");
+                    List<Andmeväli> trenniPeamisedAndmeväljad = trenn.getPeamisedVäljad();
                     AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(trenniPeamisedAndmeväljad, käskJaArgumendid[1]);
-                    if (valik == null){
+                    if (valik == null) {
                         kuvaKindlaTrenniEkraaniInfo(trenn);
                         System.out.println("Sellist IDd ei leidu.");
                         continue;
                     }
                     System.out.println(valik.andmeväli.getId());
                     andmeväljadeEkraan(valik.andmeväli);
+                    if (Objects.equals(viimaneKäsk, "BT")) return "BT";
+                    if (Objects.equals(viimaneKäsk, "B")) {
+                        kindlaTrenniEkraan(kuupäev, trenn);
+                        return "B";
+                    }
                 }
                 case "MN" -> {
+                    setViimaneKäsk("MN");
                     if (käskJaArgumendid.length < 2) {
                         kuvaKindlaTrenniEkraaniInfo(trenn);
                         System.out.println("Käsul MN peab olema vähemalt üks sõna uue nimena.");
@@ -211,6 +242,7 @@ public class Graafikaliides {
                     kuvaKindlaTrenniEkraaniInfo(trenn);
                 }
                 case "MK" -> {
+                    setViimaneKäsk("MK");
                     if (käskJaArgumendid.length < 2) {
                         kuvaKindlaTrenniEkraaniInfo(trenn);
                         System.out.println("Käsul MK peab olema vähemalt üks sõna/number kestvuse jaoks.");
@@ -225,18 +257,19 @@ public class Graafikaliides {
                     kuvaKindlaTrenniEkraaniInfo(trenn);
                 }
                 case "K" -> {
+                    setViimaneKäsk("K");
                     if (käskJaArgumendid.length != 2) {
                         kuvaKindlaTrenniEkraaniInfo(trenn);
                         System.out.println("Käsul V peab olema täpselt üks ID argument.");
                         continue;
                     }
 
-                    if(käskJaArgumendid[1].equals(trenn.getNimi())) { // tahetakse kustutada trenni
+                    if (käskJaArgumendid[1].equals(trenn.getNimi())) { // tahetakse kustutada trenni
                         andmebaas.kustutaTrenn(kuupäev, trenn.getId());
                         return "K";
                     } else {
                         AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(trenn.getPeamisedVäljad(), käskJaArgumendid[1]);
-                        if(valik != null) {
+                        if (valik != null) {
                             valik.asukoht.remove(valik.andmeväli);
                             kuvaKindlaTrenniEkraaniInfo(trenn);
                         } else {
@@ -246,6 +279,7 @@ public class Graafikaliides {
                     }
                 }
                 case "B" -> {
+                    setViimaneKäsk("B");
                     return "B";
                 }
                 case "Q" -> {
@@ -262,7 +296,7 @@ public class Graafikaliides {
         // https://stackoverflow.com/questions/16629476/how-to-center-a-print-statement-text
         String kuupäevaInfo = "Valitud kuupäev: " + kuupäev;
         String rida = "                                               ";
-        int nihe = (rida.length()-kuupäevaInfo.length())/2;
+        int nihe = (rida.length() - kuupäevaInfo.length()) / 2;
         String kuupäevaPrint = "*%" + nihe + "s%s%" + nihe + "s*\n";
 
         System.out.println("*************************************************");
@@ -291,7 +325,8 @@ public class Graafikaliides {
     public static void trennideEkraan(String kuupäev, List<Trenn> trennid) {
         kuvaTrennideEkraaniInfo(kuupäev, trennid);
 
-        käsk: while (true) {
+        käsk:
+        while (true) {
             System.out.print("Sisesta käsk: ");
             String käsk = kasutajaInput.nextLine();
             System.out.println();
@@ -316,7 +351,14 @@ public class Graafikaliides {
                             String tagastus = kindlaTrenniEkraan(kuupäev, trenn);
 
                             // kui siit tagasi tulla, siis peame ekraani infot uuesti näitama
-                            kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                            //kuvaTrennideEkraaniInfo(kuupäev, trennid);
+
+                            //ma lisasin need ja siis seda ülemist polnud vaja
+                            if (viimaneKäsk.equals("B")) {
+                                trennideEkraan(kuupäev, trennid);
+                                return;
+                            }
+                            if (Objects.equals(viimaneKäsk, "BT")) trennideEkraan(kuupäev, trennid);
                             continue käsk;
                         }
                     }
