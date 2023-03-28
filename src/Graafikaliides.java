@@ -49,19 +49,19 @@ public class Graafikaliides {
             for(Andmeväli sisemisedAndmed : andmed.getSisemisedVäljad())
                 kuvaRekursiivseltSisemisedAndmeväljad(sisemisedAndmed, sügavus+1);
     }
-    public static Andmeväli väljastaSisemisteAndmeteInfoEkraanile(List<Andmeväli> andmeväljad, String id){
+    public static AndmeväliJaAsukoht leiaRekursiivseltAndmeväliIDga(List<Andmeväli> andmeväljad, String id){
         //otsib rekursiivselt selle id üles mida sisestati ning väljastab info ekraanile ja tagastab selle välja
         for (Andmeväli väli:andmeväljad) {
             if (väli.getId().equals(id)){
-                System.out.println(väli);
-                return väli;
+                return new AndmeväliJaAsukoht(väli, andmeväljad);
             }
             else{
-                if (!väli.getSisemisedVäljad().isEmpty()) return väljastaSisemisteAndmeteInfoEkraanile(väli.getSisemisedVäljad(), id);
+                if (!väli.getSisemisedVäljad().isEmpty()) return leiaRekursiivseltAndmeväliIDga(väli.getSisemisedVäljad(), id);
             }
         }
         return null;
     }
+
     public static void kuvaSisemisteAndmeteInfo(Andmeväli andmeväli) {
         kustutaCommandPromptiTekst();
         System.out.println("*************************************************");
@@ -117,8 +117,14 @@ public class Graafikaliides {
                     }
                     List<Andmeväli> andmeteVäljad=andmeväli.getSisemisedVäljad();
 
-                    Andmeväli valitudVäli=väljastaSisemisteAndmeteInfoEkraanile(andmeteVäljad, käskJaArgumendid[1]);
-                    andmeväljadeEkraan(valitudVäli);
+                    AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(andmeteVäljad, käskJaArgumendid[1]);
+                    if (valik == null){
+                        andmeväljadeEkraan(andmeväli);
+                        System.out.println("Sellise ID-ga andmevälja ei leidu.");
+                        continue;
+                    }
+                    System.out.println(valik.andmeväli.getId());
+                    andmeväljadeEkraan(valik.andmeväli);
                 }
 
                 case "B" -> {
@@ -163,7 +169,7 @@ public class Graafikaliides {
         System.out.println("> Q - sulgeb programmi");
         System.out.println();
     }
-    public static void kindlaTrenniEkraan(String kuupäev, Trenn trenn) {
+    public static String kindlaTrenniEkraan(String kuupäev, Trenn trenn) {
         kuvaKindlaTrenniEkraaniInfo(trenn);
 
         while (true) {
@@ -180,13 +186,14 @@ public class Graafikaliides {
             switch (käskJaArgumendid[0].toUpperCase()) {
                 case "V" -> {
                     List<Andmeväli> trenniPeamisedAndmeväljad=trenn.getPeamisedVäljad();
-                    Andmeväli valitudVäli=väljastaSisemisteAndmeteInfoEkraanile(trenniPeamisedAndmeväljad, käskJaArgumendid[1]);
-                    if (valitudVäli==null){
+                    AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(trenniPeamisedAndmeväljad, käskJaArgumendid[1]);
+                    if (valik == null){
                         kuvaKindlaTrenniEkraaniInfo(trenn);
                         System.out.println("Sellist IDd ei leidu.");
                         continue;
                     }
-                    andmeväljadeEkraan(valitudVäli);
+                    System.out.println(valik.andmeväli.getId());
+                    andmeväljadeEkraan(valik.andmeväli);
                 }
                 case "MN" -> {
                     if (käskJaArgumendid.length < 2) {
@@ -225,14 +232,21 @@ public class Graafikaliides {
                     }
 
                     if(käskJaArgumendid[1].equals(trenn.getNimi())) { // tahetakse kustutada trenni
-                        // ...
-                        // siin vast lihtsalt returnib tagasi trennide ekraanile
+                        andmebaas.kustutaTrenn(kuupäev, trenn.getId());
+                        return "K";
                     } else {
-
+                        AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(trenn.getPeamisedVäljad(), käskJaArgumendid[1]);
+                        if(valik != null) {
+                            valik.asukoht.remove(valik.andmeväli);
+                            kuvaKindlaTrenniEkraaniInfo(trenn);
+                        } else {
+                            kuvaKindlaTrenniEkraaniInfo(trenn);
+                            System.out.println("Andmevälja ID-ga " + käskJaArgumendid[1] + " ei leitud.");
+                        }
                     }
                 }
                 case "B" -> {
-                    return;
+                    return "B";
                 }
                 case "Q" -> {
                     salvestaJaSulgeProgramm();
@@ -277,7 +291,7 @@ public class Graafikaliides {
     public static void trennideEkraan(String kuupäev, List<Trenn> trennid) {
         kuvaTrennideEkraaniInfo(kuupäev, trennid);
 
-        while (true) {
+        käsk: while (true) {
             System.out.print("Sisesta käsk: ");
             String käsk = kasutajaInput.nextLine();
             System.out.println();
@@ -299,14 +313,16 @@ public class Graafikaliides {
                     for (Trenn trenn : trennid) {
                         //otsib listist õige IDga trenni üles
                         if (trenn.getId().equals(käskJaArgumendid[1])) {
-                            kindlaTrenniEkraan(kuupäev, trenn);
-                            continue;
+                            String tagastus = kindlaTrenniEkraan(kuupäev, trenn);
+
+                            // kui siit tagasi tulla, siis peame ekraani infot uuesti näitama
+                            kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                            continue käsk;
                         }
                     }
 
                     kuvaTrennideEkraaniInfo(kuupäev, trennid);
                     System.out.println("Sellise ID-ga trenni ei leitud.");
-                    continue;
                 }
                 case "B" -> {
                     return; // naaseb tagasi kuupäevade ekraanile
