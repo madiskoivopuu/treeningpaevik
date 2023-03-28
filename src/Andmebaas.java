@@ -136,7 +136,7 @@ public class Andmebaas {
             andmedJson.put("id", andmed.getId());
             andmedJson.put("nimi", andmed.getNimi());
             andmedJson.put("väärtus", andmed.getVäärtus());
-            if (andmed.getSisemisedVäljad().size() == 0)
+            if (andmed.getSisemisedVäljad().size() != 0)
                 andmedJson.put("väljad", this.väljaObjektidJsoniks(andmed.getSisemisedVäljad()));
             else
                 andmedJson.put("väljad", new JSONArray());

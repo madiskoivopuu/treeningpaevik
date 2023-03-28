@@ -159,6 +159,7 @@ public class Graafikaliides {
         System.out.println("> MK uusKestvus - muuda trenni kestvust (ajaühik sisesta ise)");
         System.out.println("> K ID - kustutab andmevälja");
         System.out.println("> K trenniNimi - kustutab praeguse trenni andmed");
+        System.out.println("> B - läheb tagasi eelmisele ekraanile");
         System.out.println("> Q - sulgeb programmi");
         System.out.println();
     }
@@ -229,6 +230,9 @@ public class Graafikaliides {
                     } else {
 
                     }
+                }
+                case "B" -> {
+                    return;
                 }
                 case "Q" -> {
                     salvestaJaSulgeProgramm();
