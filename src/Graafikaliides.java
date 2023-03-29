@@ -138,17 +138,22 @@ public class Graafikaliides {
                         return "B";
                     }
                     if (Objects.equals(viimaneKäsk, "BT")) return "BT";
-
-
                 }
 
-                case "B" -> {
-                    /*if (Objects.equals(viimaneKäsk, "B")){
-                        andmeväljadeEkraan(andmeväli);
+                case "K" -> {
+                    setViimaneKäsk("K");
+                    AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(andmeväli.getSisemisedVäljad(), käskJaArgumendid[1]);
+                    if (valik != null) {
+                        valik.asukoht.remove(valik.andmeväli);
+                        kuvaSisemisteAndmeteInfo(andmeväli);
+                        System.out.println("Andmeväli kustutatud!");
+
+                    } else {
+                        kuvaSisemisteAndmeteInfo(andmeväli);
+                        System.out.println("Andmevälja ID-ga " + käskJaArgumendid[1] + " ei leitud.");
                     }
-                    else {
-                        setViimaneKäsk("B");
-                    }*/
+                }
+                case "B" -> {
                     setViimaneKäsk("B");
                     return "B";
                 }
@@ -217,7 +222,7 @@ public class Graafikaliides {
                         System.out.println("Sellist IDd ei leidu.");
                         continue;
                     }
-                    System.out.println(valik.andmeväli.getId());
+                    //System.out.println(valik.andmeväli.getId());
                     andmeväljadeEkraan(valik.andmeväli);
                     if (Objects.equals(viimaneKäsk, "BT")) return "BT";
                     if (Objects.equals(viimaneKäsk, "B")) {
@@ -350,15 +355,12 @@ public class Graafikaliides {
                         if (trenn.getId().equals(käskJaArgumendid[1])) {
                             String tagastus = kindlaTrenniEkraan(kuupäev, trenn);
 
-                            // kui siit tagasi tulla, siis peame ekraani infot uuesti näitama
-                            //kuvaTrennideEkraaniInfo(kuupäev, trennid);
-
-                            //ma lisasin need ja siis seda ülemist polnud vaja
                             if (viimaneKäsk.equals("B")) {
                                 trennideEkraan(kuupäev, trennid);
                                 return;
                             }
-                            if (Objects.equals(viimaneKäsk, "BT")) trennideEkraan(kuupäev, trennid);
+                            // kui siit tagasi tulla, siis peame ekraani infot uuesti näitama
+                            if (Objects.equals(viimaneKäsk, "BT")) kuvaTrennideEkraaniInfo(kuupäev, trennid);
                             continue käsk;
                         }
                     }
@@ -366,7 +368,17 @@ public class Graafikaliides {
                     kuvaTrennideEkraaniInfo(kuupäev, trennid);
                     System.out.println("Sellise ID-ga trenni ei leitud.");
                 }
+                case "L" -> {
+                    String[] nimiJaKestvus=käsk.substring(2).split(" \\|"+"\\|"+"\\| ");
+                    String nimi=nimiJaKestvus[0];
+                    String kestvus=nimiJaKestvus[1];
+                    andmebaas.lisaTrenn(kuupäev, nimi, kestvus);
+
+                    kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                    System.out.println("Kuupäev lisatud!");
+                }
                 case "B" -> {
+                    setViimaneKäsk("B");
                     return; // naaseb tagasi kuupäevade ekraanile
                 }
                 case "Q" -> {
