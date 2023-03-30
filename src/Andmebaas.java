@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import jdk.jshell.spi.ExecutionControl;
 import org.json.*;
 
+// Võimaldab trennide andmebaasi laadida ning salvestada, samuti muuta selle andmeid mingil moel (trenni lisamine, kustutamine jne)
+// Mõte oli, et niimoodi lahutab backendi ja frontendi rohkem ära. Ehk siis andmete töötlemise ja salvestamisega tegeleb mingi class, ning graafikaliides ei pea
+// midagi teadma, kuidas neid andmeid töödeldakse.
 public class Andmebaas {
     public static final String ANDMEBAASI_FAIL = "andmebaas.json";
     private HashMap<String, List<Trenn>> trenniAndmed;

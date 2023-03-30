@@ -1,4 +1,7 @@
 import java.util.List;
+
+// Hoiab JSONi andmebaasist saadud andmeväljade (nii välimiste kui ka sisemiste) infot.
+// Otse JSONi pealt ei ole kõige parem andmetega töötada, seega on selleks tehtud see klass, kuhu info veidike lihtsamaks kasutamiseks panna saame.
 public class Andmeväli {
     private String id;
     private String nimi;
@@ -38,14 +41,4 @@ public class Andmeväli {
     public List<Andmeväli> getSisemisedVäljad() {
         return sisemisedVäljad;
     }
-
-    public Andmeväli leiaVäliIDga(String id) {
-        for(Andmeväli väli : this.sisemisedVäljad) {
-            if(väli.getNimi() == id)
-                return väli;
-        }
-
-        return null;
-    }
-
 }

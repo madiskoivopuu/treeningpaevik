@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+// Hoiab JSONi andmebaasist saadud trennide
+// Otse JSONi pealt ei ole kõige parem andmetega töötada, seega on selleks tehtud see klass, kuhu info veidike lihtsamaks kasutamiseks panna saame.
 public class Trenn {
     private String id;
     private String kestvus;

@@ -4,16 +4,16 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Scanner;
 
-// tegeleb käskude töötlemisega ja command line asjadega
-
-//{"nimi":"km","väärtus":"6","väljad":[{"nimi":"km","väärtus":"7","väljad":[],"id":"345"}],"id":"123"}
+// Tegeleb command linel käskude töötlemisega ja trennide info väljastamisega
+// Andmebaasi salvestab ainult siis, kui kasutada Q käsku.
 public class Graafikaliides {
     private static final Scanner kasutajaInput = new Scanner(System.in);
     private static Andmebaas andmebaas = null;
-
     private static String viimaneKäsk = "";
+    private static final Random rand = new Random();
 
     public static void setViimaneKäsk(String viimaneKäsk) {
         Graafikaliides.viimaneKäsk = viimaneKäsk;
@@ -93,6 +93,8 @@ public class Graafikaliides {
         System.out.println("> Käsud: ");
         System.out.println("> V ID - valib sisemise info ning näitab selle sisu");
         System.out.println("> K ID - kustutab andmevälja");
+        System.out.println("> MN uusNimi - muudab valitud andmevälja nime");
+        System.out.println("> MV uusVäärtus - muudab valitud andmevälja väärtust");
         System.out.println("> B - läheb tagasi eelmisele ekraanile");
         System.out.println("> BT - läheb tagasi trenni juurde");
         System.out.println("> Q - sulgeb programmi");
@@ -139,7 +141,34 @@ public class Graafikaliides {
                     }
                     if (Objects.equals(viimaneKäsk, "BT")) return "BT";
                 }
+                case "MN" -> {
+                    setViimaneKäsk("MN");
+                    if (käskJaArgumendid.length < 2) {
+                        kuvaSisemisteAndmeteInfo(andmeväli);
+                        System.out.println("Käsul MN peab olema vähemalt ühe sõna pikkune argument.");
+                        continue;
+                    }
 
+                    String uusNimi = käsk.substring(2);
+                    andmeväli.setNimi(uusNimi);
+
+                    kuvaSisemisteAndmeteInfo(andmeväli);
+                    System.out.println("Andmevälja " + andmeväli.getId() + "nimi muudeti ära");
+                }
+                case "MV" -> {
+                    setViimaneKäsk("MV");
+                    if (käskJaArgumendid.length < 2) {
+                        kuvaSisemisteAndmeteInfo(andmeväli);
+                        System.out.println("Käsul MV peab olema vähemalt ühe sõna pikkune argument.");
+                        continue;
+                    }
+
+                    String uusVäärtus = käsk.substring(2);
+                    andmeväli.setVäärtus(uusVäärtus);
+
+                    kuvaSisemisteAndmeteInfo(andmeväli);
+                    System.out.println("Andmevälja " + andmeväli.getId() + " väärtus muudeti ära");
+                }
                 case "K" -> {
                     setViimaneKäsk("K");
                     AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(andmeväli.getSisemisedVäljad(), käskJaArgumendid[1]);
@@ -320,6 +349,7 @@ public class Graafikaliides {
 
         System.out.println("> Käsud: ");
         System.out.println("> V ID - valib trenni ning näitab selle sisu");
+        System.out.println("> VS - valib suvalise trenni ning näitab selle sisu");
         System.out.println("> L nimi ||| kestvus  - lisab trenni, kindlasti pange nime ja kestvuse vahele |||");
         System.out.println("> B - läheb tagasi eelmisele ekraanile");
         System.out.println("> Q - sulgeb programmi");
@@ -368,14 +398,29 @@ public class Graafikaliides {
                     kuvaTrennideEkraaniInfo(kuupäev, trennid);
                     System.out.println("Sellise ID-ga trenni ei leitud.");
                 }
+                case "VS" -> {
+                    if(trennid.isEmpty()) {
+                        kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                        System.out.println("Suvalist trenni ei saa valida, kuna kuupäevale pole lisatud mitte ühtegi trenni.");
+                        continue;
+                    }
+
+                    int indeks = rand.nextInt(trennid.size());
+                    Trenn trenn = trennid.get(indeks);
+
+                    kindlaTrenniEkraan(kuupäev, trenn);
+
+                    // kui ekraanilt tagasi tullakse
+                    kuvaTrennideEkraaniInfo(kuupäev, trennid);
+                }
                 case "L" -> {
-                    String[] nimiJaKestvus=käsk.substring(2).split(" \\|"+"\\|"+"\\| ");
-                    String nimi=nimiJaKestvus[0];
-                    String kestvus=nimiJaKestvus[1];
+                    String[] nimiJaKestvus = käsk.substring(2).split(" \\|"+"\\|"+"\\| ");
+                    String nimi = nimiJaKestvus[0];
+                    String kestvus = nimiJaKestvus[1];
                     andmebaas.lisaTrenn(kuupäev, nimi, kestvus);
 
                     kuvaTrennideEkraaniInfo(kuupäev, trennid);
-                    System.out.println("Kuupäev lisatud!");
+                    System.out.println("Trenn lisatud!");
                 }
                 case "B" -> {
                     setViimaneKäsk("B");
