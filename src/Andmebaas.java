@@ -71,6 +71,10 @@ public class Andmebaas {
         return this.trenniAndmed.remove(kuupäev) != null;
     }
 
+    public void lisaKuupäev(String kuupäev) {
+        this.trenniAndmed.put(kuupäev, new ArrayList<>());
+    }
+
     public List<String> tagastaKõikKuupäevad() {
         //kõik kuupäevad uude listi
         List<String> kõikKuupäevad=new ArrayList<>();

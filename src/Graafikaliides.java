@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 // Tegeleb command linel käskude töötlemisega ja trennide info väljastamisega
 // Andmebaasi salvestab ainult siis, kui kasutada Q käsku.
@@ -14,6 +15,7 @@ public class Graafikaliides {
     private static Andmebaas andmebaas = null;
     private static String viimaneKäsk = "";
     private static final Random rand = new Random();
+    private static final Pattern kuupäevaRegex = Pattern.compile("^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$");
 
     public static void setViimaneKäsk(String viimaneKäsk) {
         Graafikaliides.viimaneKäsk = viimaneKäsk;
@@ -459,6 +461,7 @@ public class Graafikaliides {
 
         System.out.println("> Käsud: ");
         System.out.println("> V kuupäev - valib kuupäeva ning näitab trenne sellel kuupäeval");
+        System.out.println("> L AAAA-KK-PP - lisab kuupäeva formaadiga aasta-kuu number-päev. Kui number on väiksem kui 10, siis lisada 0 numbri ette");
         System.out.println("> Q - sulgeb programmi");
         System.out.println();
     }
@@ -495,6 +498,21 @@ public class Graafikaliides {
 
                     trennideEkraan(käskJaArgumendid[1], trennid);
                     kuvaKuupäevaEkraaniInfo(); // selleks, et peale sellele ekraanile tagasi tulekut oleks kuupäevade ekraani käsud nähtaval
+                }
+                case "L" -> {
+                    if (käskJaArgumendid.length != 2) {
+                        kuvaKuupäevaEkraaniInfo();
+                        System.out.println("Käsul L peab olema täpselt üks kuupäeva argument.");
+                        continue;
+                    }
+
+                    if(!kuupäevaRegex.matcher(käskJaArgumendid[1]).matches()) {
+                        kuvaKuupäevaEkraaniInfo();
+                        System.out.println("Sisestatud kuupäev ei täitnud nõutud formaati AAAA-KK-PP. Näiteks 2023-1-4 ei ole õige, aga 2023-01-04 on");
+                        continue;
+                    }
+
+                    andmebaas.lisaKuupäev(käskJaArgumendid[1]);
                 }
                 case "Q" -> {
                     salvestaJaSulgeProgramm();
