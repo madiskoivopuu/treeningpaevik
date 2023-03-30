@@ -50,16 +50,16 @@ public class Graafikaliides {
         System.out.println("Peale kolme katset ei suudetud andmebaasi ikka faili salvestada.");
         System.out.println("Lugege veateadet ning proovige hiljem uuesti, programm praegu ei sulgu.");
     }
-
+    //kuvab sisemiste andmeväljade info ekraanile näidates vastavalt tasemeid
     public static void kuvaRekursiivseltSisemisedAndmeväljad(Andmeväli andmed, int sügavus) {
         System.out.println("--".repeat(sügavus) + "-> " + andmed);
         if (andmed.getSisemisedVäljad() != null && andmed.getSisemisedVäljad().size() != 0)
             for (Andmeväli sisemisedAndmed : andmed.getSisemisedVäljad())
                 kuvaRekursiivseltSisemisedAndmeväljad(sisemisedAndmed, sügavus + 1);
     }
-
+    //otsib rekursiivselt selle id üles mida sisestati ning väljastab info ekraanile ja tagastab selle välja
     public static AndmeväliJaAsukoht leiaRekursiivseltAndmeväliIDga(List<Andmeväli> andmeväljad, String id) {
-        //otsib rekursiivselt selle id üles mida sisestati ning väljastab info ekraanile ja tagastab selle välja
+
         for (Andmeväli väli : andmeväljad) {
             if (väli.getId().equals(id)) {
                 return new AndmeväliJaAsukoht(väli, andmeväljad);
@@ -70,7 +70,7 @@ public class Graafikaliides {
         }
         return null;
     }
-
+    //meetod mis väljastab ekraanile valitud andmevälja info ning edasiste valikute variandid
     public static void kuvaSisemisteAndmeteInfo(Andmeväli andmeväli) {
         kustutaCommandPromptiTekst();
         System.out.println("*************************************************");
@@ -103,7 +103,7 @@ public class Graafikaliides {
         System.out.println();
     }
 
-
+    //meetod mis küsib kasutajalt sisendit ning vastavalt sellele kas kuvab/muudab midagi või kutsub mingi uue funktsiooni välja
     public static String andmeväljadeEkraan(Andmeväli andmeväli) {
         kuvaSisemisteAndmeteInfo(andmeväli);
         while (true) {
@@ -119,6 +119,7 @@ public class Graafikaliides {
 
             String[] käskJaArgumendid = käsk.split(" ");
             switch (käskJaArgumendid[0].toUpperCase()) {
+                //kaustaja valis millegi vaatamise:
                 case "V" -> {
                     setViimaneKäsk("V");
                     if (käskJaArgumendid.length != 2) {
@@ -143,6 +144,7 @@ public class Graafikaliides {
                     }
                     if (Objects.equals(viimaneKäsk, "BT")) return "BT";
                 }
+                //kasutaja valis anmevälja nime muutmise:
                 case "MN" -> {
                     setViimaneKäsk("MN");
                     if (käskJaArgumendid.length < 2) {
@@ -157,6 +159,7 @@ public class Graafikaliides {
                     kuvaSisemisteAndmeteInfo(andmeväli);
                     System.out.println("Andmevälja " + andmeväli.getId() + "nimi muudeti ära");
                 }
+                //kasutaja valis andmevälja väärtuse muutmise:
                 case "MV" -> {
                     setViimaneKäsk("MV");
                     if (käskJaArgumendid.length < 2) {
@@ -171,6 +174,7 @@ public class Graafikaliides {
                     kuvaSisemisteAndmeteInfo(andmeväli);
                     System.out.println("Andmevälja " + andmeväli.getId() + " väärtus muudeti ära");
                 }
+                //kasutaja valis andmevälja kustutamise:
                 case "K" -> {
                     setViimaneKäsk("K");
                     AndmeväliJaAsukoht valik = leiaRekursiivseltAndmeväliIDga(andmeväli.getSisemisedVäljad(), käskJaArgumendid[1]);
@@ -184,14 +188,17 @@ public class Graafikaliides {
                         System.out.println("Andmevälja ID-ga " + käskJaArgumendid[1] + " ei leitud.");
                     }
                 }
+                //kasutaja soovib eelmisele ekraanile naaseda:
                 case "B" -> {
                     setViimaneKäsk("B");
                     return "B";
                 }
+                //kasutaja soovib trenniinfo juurde naaseda:
                 case "BT" -> {
                     setViimaneKäsk("BT");
                     return "BT";
                 }
+                //kasutaja soovib töö lõpetada:
                 case "Q" -> {
                     salvestaJaSulgeProgramm();
                 }
@@ -202,7 +209,7 @@ public class Graafikaliides {
             }
         }
     }
-
+    //meetod mis väljastab ekraanile valitud trenni info ning edasiste valikute variandid
     public static void kuvaKindlaTrenniEkraaniInfo(Trenn trenn) {
         System.out.println("*************************************************");
         System.out.println("*                                               *");
@@ -219,6 +226,7 @@ public class Graafikaliides {
             for (Andmeväli andmed : trenn.getPeamisedVäljad())
                 kuvaRekursiivseltSisemisedAndmeväljad(andmed, 0);
         System.out.println();
+        System.out.println("> Käsud: ");
         System.out.println("> V ID - vaata mingit kindlat andmevälja");
         System.out.println("> MN uusNimi - muuda trenni nime");
         System.out.println("> MK uusKestvus - muuda trenni kestvust (ajaühik sisesta ise)");
@@ -228,7 +236,7 @@ public class Graafikaliides {
         System.out.println("> Q - sulgeb programmi");
         System.out.println();
     }
-
+    //meetod mis küsib kasutajalt sisendit ning vastavalt sellele kas kuvab/muudab midagi või kutsub mingi uue funktsiooni välja
     public static String kindlaTrenniEkraan(String kuupäev, Trenn trenn) {
         kuvaKindlaTrenniEkraaniInfo(trenn);
 
@@ -292,6 +300,7 @@ public class Graafikaliides {
                     // väljastame uue info ekraanile
                     kuvaKindlaTrenniEkraaniInfo(trenn);
                 }
+                //kasutaja valis kas trenni või andmevälja kustutamise:
                 case "K" -> {
                     setViimaneKäsk("K");
                     if (käskJaArgumendid.length != 2) {
@@ -324,7 +333,7 @@ public class Graafikaliides {
             }
         }
     }
-
+    //meetod väljastab kindlal kuupäeval tehtud trennid ning võimalikud valikud
     public static void kuvaTrennideEkraaniInfo(String kuupäev, List<Trenn> trennid) {
         kustutaCommandPromptiTekst();
 
@@ -358,7 +367,7 @@ public class Graafikaliides {
         System.out.println();
 
     }
-
+    //meetod mis küsib kasutajalt sisendit
     public static void trennideEkraan(String kuupäev, List<Trenn> trennid) {
         kuvaTrennideEkraaniInfo(kuupäev, trennid);
 
@@ -400,6 +409,7 @@ public class Graafikaliides {
                     kuvaTrennideEkraaniInfo(kuupäev, trennid);
                     System.out.println("Sellise ID-ga trenni ei leitud.");
                 }
+                //kaustaja valis suvalise trenni vaatamise:
                 case "VS" -> {
                     if(trennid.isEmpty()) {
                         kuvaTrennideEkraaniInfo(kuupäev, trennid);
@@ -415,6 +425,7 @@ public class Graafikaliides {
                     // kui ekraanilt tagasi tullakse
                     kuvaTrennideEkraaniInfo(kuupäev, trennid);
                 }
+                //kasutaja valis trenni lisamise:
                 case "L" -> {
                     String[] nimiJaKestvus = käsk.substring(2).split(" \\|"+"\\|"+"\\| ");
                     String nimi = nimiJaKestvus[0];
@@ -438,7 +449,7 @@ public class Graafikaliides {
             }
         }
     }
-
+    //meetod mis kuvab kõikvõimalikud kuupäevad andmebaasist ja võimalikud valikud:
     public static void kuvaKuupäevaEkraaniInfo() {
         // https://stackoverflow.com/questions/2979383/how-to-clear-the-console
         kustutaCommandPromptiTekst();
@@ -466,7 +477,7 @@ public class Graafikaliides {
         System.out.println("> Q - sulgeb programmi");
         System.out.println();
     }
-
+    //meetod mis küsib kasutajalt sisendit:
     public static void kuupäevadeEkraan() {
         kuvaKuupäevaEkraaniInfo();
 
@@ -500,6 +511,7 @@ public class Graafikaliides {
                     trennideEkraan(käskJaArgumendid[1], trennid);
                     kuvaKuupäevaEkraaniInfo(); // selleks, et peale sellele ekraanile tagasi tulekut oleks kuupäevade ekraani käsud nähtaval
                 }
+                //kaustaja valis kuupäeva lisamise:
                 case "L" -> {
                     if (käskJaArgumendid.length != 2) {
                         kuvaKuupäevaEkraaniInfo();
@@ -515,6 +527,7 @@ public class Graafikaliides {
 
                     andmebaas.lisaKuupäev(käskJaArgumendid[1]);
                 }
+                //kasutaja valis kuupäeva kustutamise:
                 case "K" -> {
                     if (käskJaArgumendid.length != 2) {
                         kuvaKuupäevaEkraaniInfo();

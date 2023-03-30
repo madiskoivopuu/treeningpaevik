@@ -45,7 +45,7 @@ public class Andmebaas {
         this.trenniAndmed.get(kuupäev).add(uusTrenn);
         return true;
     }
-
+    //kustutab trenni kindla IDga mingilt kuupäevalt, kontrollides kas selline ID on olemas
     public boolean kustutaTrenn(String kuupäev, String id) {
         if(!this.trenniAndmed.containsKey(kuupäev))
             return false;
@@ -84,7 +84,7 @@ public class Andmebaas {
         });
         return kõikKuupäevad;
     }
-
+    //tagastab mingi välja sisemiste andmeväljade info rekursiivselt
     private List<Andmeväli> loeAndmeväljadRekursiivselt(JSONObject praeguseVäljaInfo) {
         ArrayList<Andmeväli> andmeväljad = new ArrayList<>();
         JSONArray andmeväljadJson = praeguseVäljaInfo.getJSONArray("väljad");
@@ -107,7 +107,7 @@ public class Andmebaas {
 
         return andmeväljad;
     }
-
+    //laeb andmebaasi faili info
     public void laeAndmebaas() throws FileNotFoundException {
         JSONTokener jsonFail = new JSONTokener(new FileReader(ANDMEBAASI_FAIL));
 
@@ -135,7 +135,7 @@ public class Andmebaas {
             }
         }
     }
-
+    //tagastab väljaobjektide JSONArray, mida andmebaas kasutab
     private JSONArray väljaObjektidJsoniks(List<Andmeväli> väljad) {
         JSONArray väljadJson = new JSONArray();
         for (Andmeväli andmed : väljad) {
@@ -154,7 +154,7 @@ public class Andmebaas {
 
         return väljadJson;
     }
-
+    //tagastab trenniobjektide JSONArray, mida andmebaas kasutab
     private JSONArray trenniObjektidJsoniks(List<Trenn> trennid) {
         JSONArray trennidJson = new JSONArray();
         for (Trenn trenn : trennid) {
