@@ -462,6 +462,7 @@ public class Graafikaliides {
         System.out.println("> Käsud: ");
         System.out.println("> V kuupäev - valib kuupäeva ning näitab trenne sellel kuupäeval");
         System.out.println("> L AAAA-KK-PP - lisab kuupäeva formaadiga aasta-kuu number-päev. Kui number on väiksem kui 10, siis lisada 0 numbri ette");
+        System.out.println("> K AAAA-KK-PP - kustutab kuupäeva");
         System.out.println("> Q - sulgeb programmi");
         System.out.println();
     }
@@ -513,6 +514,19 @@ public class Graafikaliides {
                     }
 
                     andmebaas.lisaKuupäev(käskJaArgumendid[1]);
+                }
+                case "K" -> {
+                    if (käskJaArgumendid.length != 2) {
+                        kuvaKuupäevaEkraaniInfo();
+                        System.out.println("Käsul K peab olema täpselt üks kuupäeva argument.");
+                        continue;
+                    }
+
+                    kuvaKuupäevaEkraaniInfo();
+                    if(andmebaas.kustutaKuupäev(käskJaArgumendid[1]))
+                        System.out.println("Kuupäev kustutati edukalt.");
+                    else
+                        System.out.println("Kuupäeva ei kustutatud, kuna seda ei leitud.");
                 }
                 case "Q" -> {
                     salvestaJaSulgeProgramm();
