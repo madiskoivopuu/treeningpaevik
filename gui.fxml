@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.calendarfx.view.YearMonthView?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<BorderPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #323949;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <AnchorPane prefHeight="600.0" prefWidth="253.0" BorderPane.alignment="CENTER">
+         <children>
+            <YearMonthView prefHeight="206.0" prefWidth="253.0" showToday="false" showTodayButton="false" />
+            <Group layoutY="217.0">
+               <children>
+                  <Rectangle fill="#19376d" height="384.0" stroke="#ff000000" strokeType="INSIDE" style="-fx-border-radius: 10;" width="253.0" />
+                  <Text fill="WHITE" layoutX="26.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Trennid" wrappingWidth="169.13671875">
+                     <font>
+                        <Font name="Arial Bold" size="32.0" />
+                     </font>
+                  </Text>
+                  <Line endX="100.0" layoutX="126.0" layoutY="59.0" startX="-100.0" stroke="#ffffffd8" strokeLineCap="ROUND" strokeWidth="5.0" />
+               </children>
+            </Group>
+         </children>
+      </AnchorPane>
+   </left>
+   <right>
+      <AnchorPane prefHeight="595.0" prefWidth="538.0" BorderPane.alignment="CENTER" />
+   </right>
+   <top>
+      <Pane prefHeight="43.0" prefWidth="791.0" style="-fx-background-color: #212129;" BorderPane.alignment="CENTER">
+         <children>
+            <Button accessibleText="X" ellipsisString="X" layoutX="749.0" layoutY="9.0" mnemonicParsing="false" prefHeight="16.0" prefWidth="28.0" text="X" />
+            <Button accessibleText="_" ellipsisString="_" layoutX="710.0" layoutY="9.0" mnemonicParsing="false" prefHeight="16.0" prefWidth="28.0" text="_" />
+         </children>
+      </Pane>
+   </top>
+</BorderPane>
