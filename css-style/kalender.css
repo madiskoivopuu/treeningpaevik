@@ -1,0 +1,7 @@
+.text {
+    -fx-fill: #ffffff;
+}
+
+.weekend-day > .text {
+    -fx-fill: #000000;
+}

@@ -1,1 +1,58 @@
-{"2023-03-18":[{"nimi":"Jalutamine","väljad":[],"kestvus":"80min","id":"910"},{"nimi":"Jõutrenn","väljad":[],"kestvus":"120 min","id":"436"}],"2023-02-28":[{"nimi":"Jõutrenn","väljad":[],"kestvus":"60min","id":"212"}],"2023-04-05":[{"nimi":"Jooks","väljad":[{"nimi":"km","väärtus":"5","väljad":[{"nimi":"km","väärtus":"6","väljad":[],"id":"123"}],"id":"1"}],"kestvus":"50min","id":"7"},{"nimi":"Jooks","väljad":[],"kestvus":"30min","id":"20"},{"nimi":"Suusatamine","väljad":[],"kestvus":"30min","id":"9"}]}
+{
+  "2023-03-18": [
+    {
+      "nimi": "Jalutamine",
+      "väljad": [],
+      "kestvus": "80min",
+      "id": "910"
+    },
+    {
+      "nimi": "Jõutrenn",
+      "väljad": [],
+      "kestvus": "120 min",
+      "id": "436"
+    }
+  ],
+  "2023-02-28": [
+    {
+      "nimi": "Jõutrenn",
+      "väljad": [],
+      "kestvus": "60min",
+      "id": "212"
+    }
+  ],
+  "2023-04-05": [
+    {
+      "nimi": "Jooks",
+      "väljad": [
+        {
+          "nimi": "km",
+          "väärtus": "5",
+          "väljad": [
+            {
+              "nimi": "km",
+              "väärtus": "6",
+              "väljad": [],
+              "id": "123"
+            }
+          ],
+          "id": "1"
+        }
+      ],
+      "kestvus": "50min",
+      "id": "7"
+    },
+    {
+      "nimi": "Jooks",
+      "väljad": [],
+      "kestvus": "30min",
+      "id": "20"
+    },
+    {
+      "nimi": "Suusatamine",
+      "väljad": [],
+      "kestvus": "30min",
+      "id": "9"
+    }
+  ]
+}
